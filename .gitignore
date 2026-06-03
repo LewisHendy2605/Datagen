@@ -1,1 +1,6 @@
+# Build
 /target
+
+# Output files
+*.csv
+*.xml
