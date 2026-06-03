@@ -3,8 +3,13 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*' # triggers on tags like v1.0.0
+    
+
+on:
+  push:
+    branches: [ "main" ]
+    # tags:
+    #  - 'v*'
 
 jobs:
   build:
