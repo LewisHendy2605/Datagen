@@ -17,7 +17,19 @@ use fake::uuid::UUIDv4;
 use std::fs::File;
 use std::fs::OpenOptions;
 use std::io;
-use std::io::Write;
+
+fn parse_delim(s: &str) -> Result<u8, String> {
+    match s {
+        r"\t" => Ok(b'\t'),
+        r"\n" => Ok(b'\n'),
+        r"\r" => Ok(b'\r'),
+        s if s.len() == 1 => Ok(s.as_bytes()[0]),
+        _ => Err(format!(
+            "delimiter must be a single ASCII character, got {:?}",
+            s
+        )),
+    }
+}
 
 #[derive(Parser)]
 #[command(name = "datagen", about = "Generate fake data files")]
@@ -35,13 +47,13 @@ enum Commands {
         #[arg(short, long, default_value_t = 10)]
         lines: u32,
 
-        #[arg(short, long, default_value = ",")]
-        delim: String,
+        #[arg(short, long, default_value = ",", value_parser = parse_delim)]
+        delim: u8,
 
         #[arg(
             short,
             long,
-            default_value = "index:index, id:uuid, title:title, first_name:first_name, last_name:last_name, email:email, post_code:post_code, street_name:street_name, building_number:building_number, file_path:file_path",
+            default_value = "index:index, id:uuid, title:title, first_name:first_name, last_name:last_name, email:email, post_code:post_code, street_name:street_name, building_number:building_number, file_path:file_path, quoted:quoted",
             value_delimiter = ','
         )]
         columns: Vec<String>,
@@ -50,9 +62,6 @@ enum Commands {
     Xml {
         #[arg(short, long, default_value = "output.xml")]
         path: String,
-
-        #[arg(short, long, default_value_t = 10)]
-        lines: u32,
     },
 }
 
@@ -66,8 +75,10 @@ fn open_file(path: &str) -> Result<File, io::Error> {
 }
 
 // Generates and writes csv file from input params
-fn write_csv(path: &str, lines: u32, delim: String, columns: Vec<String>) -> Result<(), io::Error> {
-    let mut file = open_file(&path)?;
+fn write_csv(path: &str, lines: u32, delim: u8, columns: Vec<String>) -> Result<(), io::Error> {
+    let file = open_file(&path)?;
+    let mut writer = csv::WriterBuilder::new().delimiter(delim).from_writer(file);
+
     let mut headers: Vec<String> = Vec::new();
     let mut types: Vec<String> = Vec::new();
 
@@ -79,8 +90,9 @@ fn write_csv(path: &str, lines: u32, delim: String, columns: Vec<String>) -> Res
         types.push(col_type.to_string());
     }
 
+    writer.write_record(headers)?;
+
     // Data
-    let mut rows: Vec<String> = Vec::new();
     for i in 1..=lines {
         // Build row
         let mut row: Vec<String> = Vec::new();
@@ -88,10 +100,12 @@ fn write_csv(path: &str, lines: u32, delim: String, columns: Vec<String>) -> Res
             let col = match t.as_str() {
                 "index" => i.to_string(),
                 "uuid" => UUIDv4.fake(),
+
                 "char" => {
                     let w: String = Word().fake();
                     w.chars().next().unwrap_or('a').to_string()
                 }
+                "quoted" => Word().fake::<String>() + &(delim as char).to_string() + Word().fake(),
 
                 "post_code" => PostCode().fake(),
                 "zip_code" => ZipCode().fake(),
@@ -129,12 +143,8 @@ fn write_csv(path: &str, lines: u32, delim: String, columns: Vec<String>) -> Res
             row.push(col)
         }
 
-        // Add to rows
-        rows.push(row.join(&delim))
+        writer.write_record(row)?;
     }
-
-    write!(file, "{}\n", headers.join(&delim))?;
-    write!(file, "{}", rows.join("\n"))?;
 
     Ok(())
 }
@@ -153,7 +163,7 @@ fn main() {
             Ok(_file) => println!("CSV File generated"),
             Err(e) => println!("Failed: {e}"),
         },
-        Commands::Xml { path, lines: _ } => match open_file(&path) {
+        Commands::Xml { path } => match open_file(&path) {
             Ok(_file) => println!("XML File generated"),
             Err(e) => println!("Failed: {e}"),
         },
