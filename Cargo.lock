@@ -210,6 +210,8 @@ dependencies = [
  "clap",
  "csv",
  "fake",
+ "serde",
+ "serde_json",
  "thiserror",
  "xml",
 ]
