@@ -17,6 +17,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             forge::csv::write(&path, records, delim, columns)?;
         }
+        cli::Commands::Tsv {
+            path,
+            records,
+            columns,
+        } => {
+            forge::csv::write(&path, records, b'\t', columns)?;
+        }
         cli::Commands::Xml {
             path,
             records,
