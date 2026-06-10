@@ -12,7 +12,7 @@ Data file generation cli tool
 forge.exe csv --path C:\documents\file.csv --records 100 --delim "," --columns "index:index, id:uuid, name:full_name, email:email""
 ```
 ```
-forge.exe csv --path C:\documents\file.tsv --records 100 --columns "index:index, id:uuid, name:full_name, email:email""
+forge.exe tsv --path C:\documents\file.tsv --records 100 --columns "index:index, id:uuid, name:full_name, email:email""
 ```
 ```
 forge.exe xml --path C:\documents\file.csv --records 100 --columns "index:index, id:uuid, name:full_name, email:email""
