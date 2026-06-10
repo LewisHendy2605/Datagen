@@ -5,6 +5,7 @@ Data file generation cli tool
 - csv / tsv / txt
 - xml
 - json
+- pdf
 
 ## Usage
 ```
@@ -18,4 +19,7 @@ forge.exe xml --path C:\documents\file.csv --records 100 --columns "index:index,
 ```
 ```
 forge.exe json --path C:\documents\file.json --records 100 --columns "index:index, id:uuid, name:full_name, email:email""
+```
+```
+forge.exe pdf --path C:\documents\file.pdf --records 100"
 ```
