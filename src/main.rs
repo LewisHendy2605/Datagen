@@ -38,6 +38,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             forge::json::write(&path, records, columns)?;
         }
+        cli::Commands::Pdf { path, records } => {
+            forge::pdf::write(&path, records)?;
+        }
     }
 
     println!("Time Elapsed: {:.2?}", start.elapsed());

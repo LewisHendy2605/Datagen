@@ -88,4 +88,12 @@ pub enum Commands {
         )]
         columns: Vec<String>,
     },
+
+    Pdf {
+        #[arg(short, long, default_value = "output.pdf")]
+        path: String,
+
+        #[arg(short, long, default_value_t = 10)]
+        records: u32,
+    },
 }

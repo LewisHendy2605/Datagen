@@ -3,5 +3,6 @@ pub mod csv;
 pub mod error;
 pub mod generator;
 pub mod json;
+pub mod pdf;
 pub mod utils;
 pub mod xml;
