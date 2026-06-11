@@ -1,6 +1,6 @@
 use super::error::ForgeError;
 
-pub fn write(path: &str, _records: u32) -> Result<(), ForgeError> {
+pub fn write(path: &str, records: u32) -> Result<(), ForgeError> {
     // Load a font from the file system
     let font_family = genpdf::fonts::from_files(
         "C:\\Users\\lewis\\Documents\\fonts\\LiberationSans",
@@ -20,8 +20,15 @@ pub fn write(path: &str, _records: u32) -> Result<(), ForgeError> {
     decorator.set_margins(10);
     doc.set_page_decorator(decorator);
 
-    // Add one or more elements
-    doc.push(genpdf::elements::Paragraph::new("This is a demo document."));
+    for i in 0..records {
+        if i > 0 {
+            doc.push(genpdf::elements::PageBreak::new());
+        }
+        doc.push(genpdf::elements::Paragraph::new(format!(
+            "Record {}",
+            i + 1
+        )));
+    }
 
     // Render the document and write it to a file
     doc.render_to_file(path).expect("Failed to write PDF file");
