@@ -2,7 +2,7 @@ use super::error::ForgeError;
 use genpdf::fonts;
 
 #[derive(rust_embed::RustEmbed)]
-#[folder = "assets\\fonts\\LiberationSans"]
+#[folder = "assets/fonts/LiberationSans"]
 struct Fonts;
 
 pub fn write(path: &str, records: u32) -> Result<(), ForgeError> {
